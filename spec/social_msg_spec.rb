@@ -94,6 +94,12 @@ describe SocialMsg do
       social_msg.to_s.should_not be_empty
       social_msg.to_s.should have_at_most(140).characters
     end
+
+    it "can be cloned as a full deep copy" do
+      clone = social_msg.clone
+      clone.title = 'Different'
+      clone.to_s.should_not eq(social_msg)
+    end
   end
 
   context "doing hashtagging" do

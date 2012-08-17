@@ -145,6 +145,5 @@ class SocialMsg
   def valid_bitly_auth(b)
     SocialMsg.valid_bitly_auth b
   end
-
 end
 
