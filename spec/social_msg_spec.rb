@@ -22,23 +22,29 @@ describe SocialMsg do
     expect( SocialMsg::VERSION ).to match(/^[\w\d\.\-\_\/]+$/)
   end
 
-  context "when initializing" do
-    it "can create a valid new instance if an obj with valid methods is passed to it" do
+  context "validation when initializing" do
+    it "can create a valid new instance if an obj with expected methods is passed to it" do
       expect( SocialMsg.new(news_item) ).to be_valid
     end
   
-    it "does not create a new instance if an invalid obj is passed in" do
+    it "does not create a new instance if an invalid obj type is passed in" do
       expect { SocialMsg.new(String.new) }.to raise_error(ArgumentError)
     end
   
     it "can create a new instance if passed a valid hash" do
       expect( 
-          SocialMsg.new( { name: 'bar', title: 'foo', link_url: 'http://baz.com' } )
+          SocialMsg.new( name: 'bar', title: 'foo', link_url: 'http://baz.com' )
       ).to be_valid
     end
   
-    it "does not create a new instance if passed an invalid hash" do
-      expect { SocialMsg.new( { foo: 'bar' } ) }.to raise_error(ArgumentError)
+    it "does not create a new instance if passed a hash without expected keys" do
+      expect { SocialMsg.new( foo: 'bar' ) }.to raise_error(ArgumentError)
+    end
+
+    it "does not create a new instance if passed an obj with nil values" do
+      expect {
+        SocialMsg.new( name: nil, title: nil, link_url: nil )
+      }.to raise_error(ArgumentError)
     end
   end
 
