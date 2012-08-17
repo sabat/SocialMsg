@@ -87,7 +87,7 @@ class SocialMsg
     self
   end
 
-  def twitter
+  def shorten
     self.hashtag.short_url.trimmed_title
   end
 
