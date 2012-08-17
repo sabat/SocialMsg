@@ -1,8 +1,12 @@
 require 'social_msg/version'
+require 'ostruct'
 
 class SocialMsg
   MAX_LENGTH = 140
   REQUIRED_METHODS = [ :name, :title, :link_url ]
+  OBJECT_ATTRS = %w{ hashtag_words bitly_auth msg_length name title link_url }
+
+  attr_reader :item
 
   def self.hashtag_words=(w)
     @hashtag_words = w if w.kind_of?(Array)
@@ -31,8 +35,12 @@ class SocialMsg
   #
 
   def initialize(item)
-    @item = item
-    raise TypeError, "Argument must have: #{REQUIRED_METHODS.join(', ')}" if not valid?
+    @item = item.kind_of?(Hash) ? OpenStruct.new(item) : item
+    raise ArgumentError, "Argument must have: #{REQUIRED_METHODS.join(', ')}" if not valid?
+  end
+
+  def clone
+    Marshal.load Marshal.dump(self)
   end
 
   def to_s
@@ -79,12 +87,21 @@ class SocialMsg
     self
   end
 
+  def twitter
+    self.hashtag.short_url.trimmed_title
+  end
+
+  def reset!
+    OBJECT_ATTRS.each { |a| self.instance_variable_set("@#{a}".to_sym, nil) }
+    self
+  end
+
   def name=(v)
     @name = v
   end
 
   def name
-    @name ||= @item.name
+    @name ||= @item.name.clone
   end
 
   def title=(v)
@@ -92,7 +109,7 @@ class SocialMsg
   end
 
   def title
-    @title ||= @item.title
+    @title ||= @item.title.clone
   end
 
   def link_url=(v)
@@ -100,11 +117,15 @@ class SocialMsg
   end
 
   def link_url
-    @link_url ||= @item.link_url
+    @link_url ||= @item.link_url.clone
   end
 
   def valid?
     @item && has_required_methods && required_methods_return_str
+  end
+
+  def ==(obj)
+    self.to_s == obj.to_s
   end
 
   private

@@ -22,12 +22,22 @@ describe SocialMsg do
     expect( SocialMsg::VERSION ).to match(/^[\w\d\.\-\_\/]+$/)
   end
 
-  it "can create a valid new instance if a valid obj is passed to it" do
+  it "can create a valid new instance if an obj with valid methods is passed to it" do
     expect( SocialMsg.new(news_item) ).to be_valid
   end
 
   it "does not create a new instance if an invalid obj is passed in" do
-    expect { SocialMsg.new(String.new) }.to raise_error(TypeError)
+    expect { SocialMsg.new(String.new) }.to raise_error(ArgumentError)
+  end
+
+  it "can create a new instance if passed a valid hash" do
+    expect( 
+        SocialMsg.new( { name: 'bar', title: 'foo', link_url: 'http://baz.com' } )
+    ).to be_valid
+  end
+
+  it "does not create a new instance if passed an invalid hash" do
+    expect { SocialMsg.new( { foo: 'bar' } ) }.to raise_error(ArgumentError)
   end
 
   it "can change its name" do
@@ -135,9 +145,46 @@ describe SocialMsg do
   end
 
   it "can trim the title after having hashtags and URL shortening" do
+    SocialMsg.hashtag_words = words
+    SocialMsg.bitly_auth = bitly_auth
+    Bitly::Url.should_receive(:new).and_return(bitly)
+
     expect { social_msg.hashtag.short_url.trimmed_title }.to change { social_msg.to_s }
     social_msg.to_s.should_not be_empty
     social_msg.to_s.should have_at_most(140).characters
+  end
+
+  it "can do everything (hashtag, short URL, shorten text) with one method" do
+    SocialMsg.hashtag_words = words
+    SocialMsg.bitly_auth = bitly_auth
+    Bitly::Url.should_receive(:new).and_return(bitly)
+
+    expect { social_msg.twitter }.to change { social_msg.to_s }
+    social_msg.to_s.should_not be_empty
+    social_msg.to_s.should have_at_most(140).characters
+  end
+
+  it "can reset itself to its original state" do
+    SocialMsg.hashtag_words = words
+    SocialMsg.bitly_auth = bitly_auth
+    Bitly::Url.should_receive(:new).and_return(bitly)
+    orig = social_msg.clone
+
+    expect { social_msg.twitter }.to change { social_msg.to_s }
+    social_msg.reset!.should eq(orig)
+  end
+
+  context "when compared with ==" do
+    it "returns true if equal" do
+      social_msg2 = social_msg.clone
+      social_msg.should eq(social_msg2)
+    end
+
+    it "returns false if not equal" do
+      social_msg2 = social_msg.clone
+      social_msg2.title = 'Something Different'
+      social_msg.should_not eq(social_msg2)
+    end
   end
 end
 
