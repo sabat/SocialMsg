@@ -3,4 +3,5 @@ gemspec
 
 gem 'debugger'
 gem 'faker'
+gem 'bitly'
 
