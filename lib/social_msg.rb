@@ -1,4 +1,5 @@
 require 'social_msg/version'
+require 'social_msg/object'
 require 'ostruct'
 
 class SocialMsg
@@ -44,7 +45,14 @@ class SocialMsg
   end
 
   def to_s
-    "#{self.name}: #{self.title} #{self.link_url}"
+    name_out = self.name.present? ? "#{self.name}:" : ''
+    [ name_out, self.title, self.link_url ].select { |str| str.present? }.join(' ')
+  end
+
+  alias :string :to_s
+
+  def empty?
+    self.to_s.empty?
   end
 
   def hashtag(words=nil)

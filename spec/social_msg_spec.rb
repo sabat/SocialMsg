@@ -68,6 +68,30 @@ describe SocialMsg do
       expect( social_msg.to_s ).to be_kind_of(String)
     end
 
+    it "does not add a colon to the name if the name is empty" do
+      social_msg.name = ''
+      expect( social_msg.to_s ).to_not match(/^:/)
+    end
+
+    it "does not print extra spaces if a field is empty" do
+      social_msg.name = ''
+      social_msg.title = ''
+      expect( social_msg.to_s ).to_not match(/\s\s/)
+    end
+
+    context "when checking if empty" do
+      it "returns true if the output is empty" do
+        social_msg.name = ''
+        social_msg.title = ''
+        social_msg.link_url = ''
+        expect( social_msg.empty? ).to be_true
+      end
+
+      it "returns false if the output is not empty" do
+        expect( social_msg.empty? ).to be_false
+      end
+    end
+
     it "can reset itself to its original state" do
       SocialMsg.hashtag_words = words
       SocialMsg.bitly_auth = bitly_auth
