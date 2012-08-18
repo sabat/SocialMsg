@@ -98,7 +98,7 @@ describe SocialMsg do
       Bitly::Url.should_receive(:new).and_return(bitly)
       orig = social_msg.clone
 
-      expect { social_msg.shorten }.to change { social_msg.to_s }
+      expect { social_msg.shorten! }.to change { social_msg.to_s }
       social_msg.reset!.should eq(orig)
     end
 
@@ -120,7 +120,7 @@ describe SocialMsg do
       SocialMsg.bitly_auth = bitly_auth
       Bitly::Url.should_receive(:new).and_return(bitly)
   
-      expect { social_msg.shorten }.to change { social_msg.to_s }
+      expect { social_msg.shorten! }.to change { social_msg.to_s }
       social_msg.to_s.should_not be_empty
       social_msg.to_s.should have_at_most(140).characters
     end
@@ -140,23 +140,23 @@ describe SocialMsg do
   
     it "can add hashtags to the title if keywords are passed in as an array" do
       SocialMsg.hashtag_words = []
-      expect( social_msg.hashtag(words).to_s ).to match(/\#Bigfoot/)
+      expect( social_msg.hashtag!(words).to_s ).to match(/\#Bigfoot/)
     end
   
     it "can add hashtags to the title if keywords are set at the class level" do
       SocialMsg.hashtag_words = words
-      expect( social_msg.hashtag.to_s ).to match(/\#Bigfoot/)
+      expect( social_msg.hashtag!.to_s ).to match(/\#Bigfoot/)
     end
   
     it "does not add hashtags if the keywords obj is invalid" do
       SocialMsg.hashtag_words = []
-      expect { social_msg.hashtag(900) }.to_not change { social_msg.to_s }
+      expect { social_msg.hashtag!(900) }.to_not change { social_msg.to_s }
     end
   
     it "does not add a hashtag if a keyword already has one" do
       SocialMsg.hashtag_words = words
       social_msg.title = '#Bigfoot #UFO sightings in the same place!'
-      expect { social_msg.hashtag }.to_not change { social_msg.to_s }
+      expect { social_msg.hashtag! }.to_not change { social_msg.to_s }
     end
   end
 
@@ -168,31 +168,31 @@ describe SocialMsg do
   
     it "can shorten the link_url if Bitly args are passed in" do
       Bitly::Url.should_receive(:new).and_return(bitly)
-      expect { social_msg.short_url(bitly_auth) }.to change { social_msg.to_s }
+      expect { social_msg.short_url!(bitly_auth) }.to change { social_msg.to_s }
     end
   
     it "can shorten the link_url if Bitly args are set at the class level" do
       Bitly::Url.should_receive(:new).and_return(bitly)
       SocialMsg.bitly_auth = bitly_auth
-      expect { social_msg.short_url }.to change { social_msg.to_s }
+      expect { social_msg.short_url! }.to change { social_msg.to_s }
     end
   
     it "will not shorten the URL if it has an empty Bitly auth pair" do
       Bitly::Url.stub(:new).and_return(bitly)
       SocialMsg.bitly_auth = {}
-      expect { social_msg.short_url }.to_not change { social_msg.to_s }
+      expect { social_msg.short_url! }.to_not change { social_msg.to_s }
     end
   
     it "will not shorten the URL if it has a badly formed Bitly auth pair" do
       Bitly::Url.should_receive(:new).and_raise(ArgumentError)
       SocialMsg.bitly_auth = { username: nil, api_key: '123' }
-      expect { social_msg.short_url }.to_not change { social_msg.to_s }
+      expect { social_msg.short_url! }.to_not change { social_msg.to_s }
     end
   
     it "will not shorten the URL if it has Bitly auth that bitly.com won't recognize" do
       Bitly::Url.should_receive(:new).and_raise(BitlyError)
       SocialMsg.bitly_auth = { username: 'bogus_user', api_key: '123' }
-      expect { social_msg.short_url }.to_not change { social_msg.to_s }
+      expect { social_msg.short_url! }.to_not change { social_msg.to_s }
     end
   end
 
@@ -203,21 +203,21 @@ describe SocialMsg do
     end
   
     it "can trim the title if the max len is passed in" do
-      expect { social_msg.trimmed_title(140) }.to change { social_msg.to_s }
+      expect { social_msg.trimmed_title!(140) }.to change { social_msg.to_s }
       social_msg.to_s.should_not be_empty
       social_msg.to_s.should have_at_most(140).characters
     end
   
     it "can trim the title if the max len is set at the class level" do
       SocialMsg.max_length = 110
-      expect { social_msg.trimmed_title }.to change { social_msg.to_s }
+      expect { social_msg.trimmed_title! }.to change { social_msg.to_s }
       social_msg.to_s.should_not be_empty
       social_msg.to_s.should have_at_most(110).characters
     end
   
     it "can trim the title to a default if the max len is not set" do
       SocialMsg.max_length = nil
-      expect { social_msg.trimmed_title }.to change { social_msg.to_s }
+      expect { social_msg.trimmed_title! }.to change { social_msg.to_s }
       social_msg.to_s.should_not be_empty
       social_msg.to_s.should have_at_most(140).characters
     end
@@ -227,7 +227,7 @@ describe SocialMsg do
       SocialMsg.bitly_auth = bitly_auth
       Bitly::Url.should_receive(:new).and_return(bitly)
   
-      expect { social_msg.hashtag.short_url.trimmed_title }.to change { social_msg.to_s }
+      expect { social_msg.hashtag!.short_url!.trimmed_title! }.to change { social_msg.to_s }
       social_msg.to_s.should_not be_empty
       social_msg.to_s.should have_at_most(140).characters
     end

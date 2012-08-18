@@ -55,7 +55,7 @@ class SocialMsg
     self.to_s.empty?
   end
 
-  def hashtag(words=nil)
+  def hashtag!(words=nil)
     words ||= SocialMsg.hashtag_words
 
     if words.kind_of?(Array)
@@ -66,7 +66,7 @@ class SocialMsg
     self
   end
 
-  def short_url(opts={})
+  def short_url!(opts={})
     bitly_auth = opts[:bitly_auth] || SocialMsg.bitly_auth
     if valid_bitly_auth(bitly_auth)
       bitly_username = bitly_auth[:username]
@@ -82,7 +82,7 @@ class SocialMsg
     self
   end
 
-  def trimmed_title(len=nil)
+  def trimmed_title!(len=nil)
     max_length = len || SocialMsg.max_length
     size = self.to_s.size
     ellipses = '..'
@@ -95,8 +95,8 @@ class SocialMsg
     self
   end
 
-  def shorten
-    self.hashtag.short_url.trimmed_title
+  def shorten!
+    self.hashtag!.short_url!.trimmed_title!
   end
 
   def reset!
