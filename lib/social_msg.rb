@@ -1,6 +1,7 @@
 require 'social_msg/version'
 require 'social_msg/object'
 require 'ostruct'
+require 'bitly'
 
 class SocialMsg
   MAX_LENGTH = 140
