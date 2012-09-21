@@ -76,7 +76,7 @@ class SocialMsg
       begin
         @link_url = Bitly::Url.new(bitly_username, bitly_api_key, long_url: self.link_url).shorten
       rescue BitlyError, ArgumentError => e
-        warn "WARNING: could not shorten link URL #{self.link_url}: #{e}"
+        puts "WARNING: could not shorten link URL #{self.link_url}: #{e}"
       end
     end
 
