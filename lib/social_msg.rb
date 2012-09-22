@@ -72,7 +72,7 @@ class SocialMsg
     if valid_bitly_auth?
       begin
         Bitly.use_api_version_3
-        @link_url = bitly.shorten(self.link_url)
+        @link_url = bitly.shorten(self.link_url).short_url
       rescue BitlyError, ArgumentError => e
         warn "WARNING: could not shorten link URL #{self.link_url}: #{e}"
       end
@@ -154,7 +154,7 @@ class SocialMsg
   end
 
   def bitly
-    @bitly ||= Bitly.new(bitly_auth)
+    @bitly ||= Bitly.new(bitly_auth[0], bitly_auth[1])
   end
 
   def self.valid_bitly_auth?

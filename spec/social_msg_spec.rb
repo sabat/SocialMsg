@@ -7,7 +7,8 @@ describe SocialMsg do
   let(:social_msg)  { SocialMsg.new news_item }
   let(:bitly) do
     b = double('bitly')
-    b.stub(:shorten).and_return('http://bit.ly/NGx5IN')
+    b.stub(:shorten).and_return(b)
+    b.stub(:short_url).and_return('http://bit.ly/NGx5IN')
     b
   end
 
@@ -185,7 +186,7 @@ describe SocialMsg do
   
     it "will not shorten the URL if it has a badly formed Bitly auth pair" do
       SocialMsg.bitly_auth = [nil, '123']
-      Bitly.should_receive(:new).with(SocialMsg.bitly_auth).and_raise(ArgumentError)
+      Bitly.should_receive(:new).and_raise(ArgumentError)
       expect { social_msg.short_url! }.to_not change { social_msg.to_s }
     end
   
