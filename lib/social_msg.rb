@@ -68,15 +68,13 @@ class SocialMsg
   end
 
   def short_url!(opts={})
-    bitly_auth = opts[:bitly_auth] || SocialMsg.bitly_auth
-    if valid_bitly_auth(bitly_auth)
-      bitly_username = bitly_auth[:username]
-      bitly_api_key = bitly_auth[:api_key]
-
+    SocialMsg.bitly_auth = opts[:bitly_auth] if opts[:bitly_auth]
+    if valid_bitly_auth?
       begin
-        @link_url = Bitly::Url.new(bitly_username, bitly_api_key, long_url: self.link_url).shorten
+        Bitly.use_api_version_3
+        @link_url = bitly.shorten(self.link_url)
       rescue BitlyError, ArgumentError => e
-        puts "WARNING: could not shorten link URL #{self.link_url}: #{e}"
+        warn "WARNING: could not shorten link URL #{self.link_url}: #{e}"
       end
     end
 
@@ -137,6 +135,14 @@ class SocialMsg
     self.to_s == obj.to_s
   end
 
+  def bitly_auth=(b)
+    SocialMsg.bitly_auth = b
+  end
+
+  def bitly_auth
+    SocialMsg.bitly_auth
+  end
+
   private
 
   def has_required_methods
@@ -147,12 +153,16 @@ class SocialMsg
     REQUIRED_METHODS.all? { |meth| @item.send(meth).kind_of? String }
   end
 
-  def self.valid_bitly_auth(b)
-    b.kind_of?(Hash) && b.has_key?(:username) && b.has_key?(:api_key)
+  def bitly
+    @bitly ||= Bitly.new(bitly_auth)
   end
 
-  def valid_bitly_auth(b)
-    SocialMsg.valid_bitly_auth b
+  def self.valid_bitly_auth?
+    bitly_auth.kind_of?(Array) && bitly_auth.size == 2
+  end
+
+  def valid_bitly_auth?
+    SocialMsg.valid_bitly_auth?
   end
 end
 

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe SocialMsg do
   let(:words)       { %w{ UFO bigfoot } }
-  let(:bitly_auth)  { { username: 'test', api_key: '02934uhsdfsdkjh23_32jn' } }
+  let(:bitly_auth)  { ['test', '02934uhsdfsdkjh23_32jn'] }
   let(:news_item)   { FakeNewsItem.new }
   let(:social_msg)  { SocialMsg.new news_item }
   let(:bitly) do
@@ -95,7 +95,7 @@ describe SocialMsg do
     it "can reset itself to its original state" do
       SocialMsg.hashtag_words = words
       SocialMsg.bitly_auth = bitly_auth
-      Bitly::Url.should_receive(:new).and_return(bitly)
+      Bitly.stub(:new).and_return(bitly)
       orig = social_msg.clone
 
       expect { social_msg.shorten! }.to change { social_msg.to_s }
@@ -118,7 +118,7 @@ describe SocialMsg do
     it "can do all modifications (hashtag, short URL, shorten text) with one method" do
       SocialMsg.hashtag_words = words
       SocialMsg.bitly_auth = bitly_auth
-      Bitly::Url.should_receive(:new).and_return(bitly)
+      Bitly.stub(:new).and_return(bitly)
   
       expect { social_msg.shorten! }.to change { social_msg.to_s }
       social_msg.to_s.should_not be_empty
@@ -167,31 +167,31 @@ describe SocialMsg do
     end
   
     it "can shorten the link_url if Bitly args are passed in" do
-      Bitly::Url.should_receive(:new).and_return(bitly)
-      expect { social_msg.short_url!(bitly_auth) }.to change { social_msg.to_s }
+      Bitly.stub(:new).and_return(bitly)
+      expect { social_msg.short_url!(bitly_auth: bitly_auth) }.to change { social_msg.to_s }
     end
   
     it "can shorten the link_url if Bitly args are set at the class level" do
-      Bitly::Url.should_receive(:new).and_return(bitly)
+      Bitly.should_receive(:new).and_return(bitly)
       SocialMsg.bitly_auth = bitly_auth
       expect { social_msg.short_url! }.to change { social_msg.to_s }
     end
   
     it "will not shorten the URL if it has an empty Bitly auth pair" do
-      Bitly::Url.stub(:new).and_return(bitly)
+      Bitly.stub(:new).and_return(bitly)
       SocialMsg.bitly_auth = {}
       expect { social_msg.short_url! }.to_not change { social_msg.to_s }
     end
   
     it "will not shorten the URL if it has a badly formed Bitly auth pair" do
-      Bitly::Url.should_receive(:new).and_raise(ArgumentError)
-      SocialMsg.bitly_auth = { username: nil, api_key: '123' }
+      SocialMsg.bitly_auth = [nil, '123']
+      Bitly.should_receive(:new).with(SocialMsg.bitly_auth).and_raise(ArgumentError)
       expect { social_msg.short_url! }.to_not change { social_msg.to_s }
     end
   
     it "will not shorten the URL if it has Bitly auth that bitly.com won't recognize" do
-      Bitly::Url.should_receive(:new).and_raise(BitlyError)
-      SocialMsg.bitly_auth = { username: 'bogus_user', api_key: '123' }
+      Bitly.should_receive(:new).and_raise(BitlyError)
+      SocialMsg.bitly_auth = ['bogus_user', '123']
       expect { social_msg.short_url! }.to_not change { social_msg.to_s }
     end
   end
@@ -225,7 +225,7 @@ describe SocialMsg do
     it "can trim the title after having hashtags and URL shortening" do
       SocialMsg.hashtag_words = words
       SocialMsg.bitly_auth = bitly_auth
-      Bitly::Url.should_receive(:new).and_return(bitly)
+      Bitly.should_receive(:new).and_return(bitly)
   
       expect { social_msg.hashtag!.short_url!.trimmed_title! }.to change { social_msg.to_s }
       social_msg.to_s.should_not be_empty
