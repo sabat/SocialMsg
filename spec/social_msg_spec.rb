@@ -50,6 +50,11 @@ describe SocialMsg do
   end
 
   context "an instance" do
+    it "can set the bitly auth with a helper method" do
+      social_msg.bitly_auth = 'foo'
+      SocialMsg.bitly_auth.should eq 'foo'
+    end
+
     it "can change its name" do
       social_msg.name = 'Not the Original Name'
       social_msg.name.should eq('Not the Original Name')
