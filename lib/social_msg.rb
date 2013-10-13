@@ -45,19 +45,19 @@ class SocialMsg
     Marshal.load Marshal.dump(self)
   end
 
-  def to_text
+  def to_s
     name_out = self.name.present? ? "#{self.name}:" : ''
     [ name_out, self.title ].select { |str| str.present? }.join(' ')
   end
 
-  def to_s
-    [ to_text, self.link_url ].select { |str| str.present? }.join(' ')
+  def to_text
+    [ to_s, self.link_url ].select { |str| str.present? }.join(' ')
   end
 
-  alias :string :to_s
+  alias :string :to_text
 
   def empty?
-    self.to_s.empty?
+    self.to_text.empty?
   end
 
   def hashtag!(words=nil)
@@ -87,7 +87,7 @@ class SocialMsg
 
   def trimmed_title!(len=nil)
     max_length = len || SocialMsg.max_length
-    size = self.to_s.size
+    size = self.to_text.size
     ellipses = '..'
 
     if size > max_length
@@ -136,7 +136,7 @@ class SocialMsg
   end
 
   def ==(obj)
-    self.to_s == obj.to_s
+    self.to_text == obj.to_text
   end
 
   def bitly_auth=(b)
