@@ -45,9 +45,13 @@ class SocialMsg
     Marshal.load Marshal.dump(self)
   end
 
-  def to_s
+  def to_text
     name_out = self.name.present? ? "#{self.name}:" : ''
-    [ name_out, self.title, self.link_url ].select { |str| str.present? }.join(' ')
+    [ name_out, self.title ].select { |str| str.present? }.join(' ')
+  end
+
+  def to_s
+    [ to_text, self.link_url ].select { |str| str.present? }.join(' ')
   end
 
   alias :string :to_s

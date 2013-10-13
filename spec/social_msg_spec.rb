@@ -69,6 +69,11 @@ describe SocialMsg do
       social_msg.link_url = 'http://not.the.original.com'
       social_msg.link_url.should eq('http://not.the.original.com')
     end
+
+    it "can print its text without a URL" do
+      expect( social_msg.to_text ).to be_kind_of(String)
+      expect( social_msg.to_text ).to_not match /http:\/\//
+    end
   
     it "can print its output as a string" do
       expect( social_msg.to_s ).to be_kind_of(String)
@@ -196,7 +201,7 @@ describe SocialMsg do
     end
   
     it "will not shorten the URL if it has Bitly auth that bitly.com won't recognize" do
-      Bitly.should_receive(:new).and_raise(BitlyError)
+      Bitly.should_receive(:new).and_raise(BitlyError.new('Test error', 1))
       SocialMsg.bitly_auth = ['bogus_user', '123']
       expect { social_msg.short_url! }.to_not change { social_msg.to_s }
     end
