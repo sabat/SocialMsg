@@ -8,7 +8,7 @@ class SocialMsg
   REQUIRED_METHODS = [ :name, :title, :link_url ]
   OBJECT_ATTRS = %w{ hashtag_words bitly_auth msg_length name title link_url }
 
-  attr_reader :item
+  attr_reader :item, :title
 
   def self.hashtag_words=(w)
     @hashtag_words = w if w.kind_of?(Array)
@@ -47,17 +47,13 @@ class SocialMsg
 
   def to_s
     name_out = self.name.present? ? "#{self.name}:" : ''
-    [ name_out, self.title ].select { |str| str.present? }.join(' ')
+    [ name_out, self.title, self.link_url ].select { |str| str.present? }.join(' ')
   end
 
-  def to_text
-    [ to_s, self.link_url ].select { |str| str.present? }.join(' ')
-  end
-
-  alias :string :to_text
+  alias :string :to_s
 
   def empty?
-    self.to_text.empty?
+    self.to_s.empty?
   end
 
   def hashtag!(words=nil)
@@ -87,7 +83,7 @@ class SocialMsg
 
   def trimmed_title!(len=nil)
     max_length = len || SocialMsg.max_length
-    size = self.to_text.size
+    size = self.to_s.size
     ellipses = '..'
 
     if size > max_length
@@ -136,7 +132,7 @@ class SocialMsg
   end
 
   def ==(obj)
-    self.to_text == obj.to_text
+    self.to_s == obj.to_s
   end
 
   def bitly_auth=(b)
