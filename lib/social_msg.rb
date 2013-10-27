@@ -38,7 +38,7 @@ class SocialMsg
 
   def initialize(item)
     @item = item.kind_of?(Hash) ? OpenStruct.new(item) : item
-    raise ArgumentError, "Argument must have: #{REQUIRED_METHODS.join(', ')}" if not valid?
+    raise ArgumentError, "Argument must have: #{REQUIRED_METHODS.join(', ')}, got: #{item.inspect}" if not valid?
   end
 
   def clone
