@@ -10,6 +10,12 @@ class SocialMsg
 
   attr_reader :item, :title
 
+  @shorten_urls = true
+
+  class << self
+    attr_accessor :shorten_urls
+  end
+
   def self.hashtag_words=(w)
     @hashtag_words = w if w.kind_of?(Array)
   end
@@ -67,9 +73,13 @@ class SocialMsg
     self
   end
 
+  def shorten_urls?
+    self.class.shorten_urls
+  end
+
   def short_url!(opts={})
     SocialMsg.bitly_auth = opts[:bitly_auth] if opts[:bitly_auth]
-    if valid_bitly_auth?
+    if valid_bitly_auth? && shorten_urls?
       begin
         Bitly.use_api_version_3
         @link_url = bitly.shorten(self.link_url).short_url

@@ -2,7 +2,7 @@ require 'simplecov'
 require 'rspec'
 require 'faker'
 require 'bitly'
-require 'debugger'
+require 'byebug'
 
 files = Dir[ "#{Dir.pwd}/spec/support/**/*.rb" ]
 files.each { |f| require f }

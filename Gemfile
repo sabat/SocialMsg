@@ -1,8 +1,9 @@
-source :rubygems
+source 'https://rubygems.org'
+ruby '2.1.5'
 gemspec
 
 group :development, :test do
-  gem 'debugger'
+  gem 'byebug'
 end
 
 group :test do

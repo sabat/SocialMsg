@@ -206,6 +206,12 @@ describe SocialMsg do
       SocialMsg.bitly_auth = ['bogus_user', '123']
       expect { social_msg.short_url! }.to_not change { social_msg.to_s }
     end
+
+    it "will not shorten the URL if the SocialMsg.shorten_urls switch is off" do
+      SocialMsg.shorten_urls = false
+      expect { social_msg.short_url! }.to_not change { social_msg.to_s }
+      SocialMsg.shorten_urls = true
+    end
   end
 
   context "when shortening the text" do
