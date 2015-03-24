@@ -134,7 +134,7 @@ describe SocialMsg do
   
       expect { social_msg.shorten! }.to change { social_msg.to_s }
       social_msg.to_s.should_not be_empty
-      social_msg.to_s.should have_at_most(140).characters
+      social_msg.size.should be <= 140
     end
 
     it "can be cloned as a full deep copy" do
@@ -223,21 +223,21 @@ describe SocialMsg do
     it "can trim the title if the max len is passed in" do
       expect { social_msg.trimmed_title!(140) }.to change { social_msg.to_s }
       social_msg.to_s.should_not be_empty
-      social_msg.to_s.should have_at_most(140).characters
+      social_msg.size.should be <= 140
     end
   
     it "can trim the title if the max len is set at the class level" do
       SocialMsg.max_length = 110
       expect { social_msg.trimmed_title! }.to change { social_msg.to_s }
       social_msg.to_s.should_not be_empty
-      social_msg.to_s.should have_at_most(110).characters
+      social_msg.size.should be <= 110
     end
   
     it "can trim the title to a default if the max len is not set" do
       SocialMsg.max_length = nil
       expect { social_msg.trimmed_title! }.to change { social_msg.to_s }
       social_msg.to_s.should_not be_empty
-      social_msg.to_s.should have_at_most(140).characters
+      social_msg.size.should be <= 140
     end
   
     it "can trim the title after having hashtags and URL shortening" do
@@ -247,7 +247,18 @@ describe SocialMsg do
   
       expect { social_msg.hashtag!.short_url!.trimmed_title! }.to change { social_msg.to_s }
       social_msg.to_s.should_not be_empty
-      social_msg.to_s.should have_at_most(140).characters
+      social_msg.size.should be <= 140
+    end
+
+    it "calculates its size" do
+      social_msg.size.should be_a Fixnum
+    end
+
+    it "counts links as 20 characters no matter what the actual length" do
+      social_msg.name = 'a'
+      social_msg.title = 'b'
+      social_msg.link_url = 'http://foobarbaz.com/'
+      social_msg.size.should eq(22)
     end
   end
 

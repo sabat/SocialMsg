@@ -5,6 +5,7 @@ require 'bitly'
 
 class SocialMsg
   MAX_LENGTH = 140
+  URL_LENGTH = 20
   REQUIRED_METHODS = [ :name, :title, :link_url ]
   OBJECT_ATTRS = %w{ hashtag_words bitly_auth msg_length name title link_url }
 
@@ -58,6 +59,10 @@ class SocialMsg
 
   alias :string :to_s
 
+  def size
+    (self.name ? self.name.size : 0) + (self.title ? self.title.size : 0) + (self.link_url ? URL_LENGTH : 0)
+  end
+
   def empty?
     self.to_s.empty?
   end
@@ -93,11 +98,9 @@ class SocialMsg
 
   def trimmed_title!(len=nil)
     max_length = len || SocialMsg.max_length
-    size = self.to_s.size
     ellipses = '..'
-
-    if size > max_length
-      subtract = size - max_length + ellipses.size + 1
+    if self.size > max_length
+      subtract = self.size - max_length + ellipses.size + 1
       @title = @title[0..(@title.size - subtract)] + ellipses
     end
 
