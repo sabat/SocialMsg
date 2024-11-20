@@ -88,7 +88,7 @@ class SocialMsg
 
     if valid_bitly_auth? && shorten_urls?
       begin
-        bitly.shorten(long_url: self.link_url).link
+        @link_url = bitly.shorten(long_url: self.link_url).link
       rescue Bitly::Error, ArgumentError => e
         warn "WARNING: could not shorten link URL #{self.link_url}: #{e}"
       end

@@ -4,3 +4,4 @@ pkg/
 vendor/cache/*.gem
 *.swp
 coverage
+vendor/
