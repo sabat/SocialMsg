@@ -84,7 +84,7 @@ class SocialMsg
   end
 
   def short_url(opts={})
-    SocialMsg.bitly_auth = opts[:bitly_auth]
+    SocialMsg.bitly_auth ||= opts[:bitly_auth]
 
     if valid_bitly_auth? && shorten_urls?
       begin
