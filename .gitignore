@@ -5,3 +5,4 @@ vendor/cache/*.gem
 *.swp
 coverage
 vendor/
+.byebug_history

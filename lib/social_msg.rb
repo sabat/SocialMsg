@@ -173,7 +173,7 @@ class SocialMsg
   end
 
   def self.valid_bitly_auth?
-    bitly_auth.kind_of?(Array) && bitly_auth.size == 2
+    bitly_auth.kind_of?(String) && bitly_auth.size > 0
   end
 
   def valid_bitly_auth?
