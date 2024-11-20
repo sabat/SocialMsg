@@ -6,8 +6,8 @@ require 'bitly'
 class SocialMsg
   MAX_LENGTH = 140
   URL_LENGTH = 20
-  REQUIRED_METHODS = [ :name, :title, :link_url ]
-  OBJECT_ATTRS = %w{ hashtag_words bitly_auth msg_length name title link_url }
+  REQUIRED_METHODS = %i(name title link_url)
+  OBJECT_ATTRS = %w(hashtag_words bitly_auth msg_length name title link_url)
 
   attr_reader :item, :title
 
@@ -49,12 +49,12 @@ class SocialMsg
   end
 
   def clone
-    Marshal.load Marshal.dump(self)
+    Marshal.load(Marshal.dump(self))
   end
 
   def to_s
     name_out = self.name.present? ? "#{self.name}:" : ''
-    [ name_out, self.title, self.link_url ].select { |str| str.present? }.join(' ')
+    [name_out, self.title, self.link_url].select(&:present?).join(' ')
   end
 
   alias :string :to_s
@@ -67,7 +67,7 @@ class SocialMsg
     self.to_s.empty?
   end
 
-  def hashtag!(words=nil)
+  def hashtag(words=nil)
     words ||= SocialMsg.hashtag_words
 
     if words.kind_of?(Array)
@@ -75,6 +75,7 @@ class SocialMsg
         self.title.sub!(/(\b)(#{word})(\b)/i, '\1#\2\3') unless self.title.match(/\##{word}/i)
       end
     end
+
     self
   end
 
@@ -82,12 +83,12 @@ class SocialMsg
     self.class.shorten_urls
   end
 
-  def short_url!(opts={})
+  def short_url(opts={})
     SocialMsg.bitly_auth = opts[:bitly_auth]
 
     if valid_bitly_auth? && shorten_urls?
       begin
-        @link_url = bitly.shorten(long_url: self.link_url)
+        bitly.shorten(long_url: self.link_url).link
       rescue Bitly::Error, ArgumentError => e
         warn "WARNING: could not shorten link URL #{self.link_url}: #{e}"
       end
@@ -96,9 +97,10 @@ class SocialMsg
     self
   end
 
-  def trimmed_title!(len=nil)
+  def trimmed_title(len=nil)
     max_length = len || SocialMsg.max_length
     ellipses = '..'
+
     if self.size > max_length
       subtract = self.size - max_length + ellipses.size + 1
       @title = @title[0..(@title.size - subtract)] + ellipses
@@ -107,8 +109,8 @@ class SocialMsg
     self
   end
 
-  def shorten!
-    self.hashtag!.short_url!.trimmed_title!
+  def shorten
+    self.hashtag.short_url.trimmed_title
   end
 
   def reset!
@@ -178,4 +180,3 @@ class SocialMsg
     SocialMsg.valid_bitly_auth?
   end
 end
-
