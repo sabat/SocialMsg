@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '2.1.5'
+ruby '3.3.6'
 gemspec
 
 group :development, :test do
