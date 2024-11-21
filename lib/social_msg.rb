@@ -6,7 +6,7 @@ require 'bitly'
 class SocialMsg
   MAX_LENGTH = 140
   URL_LENGTH = 20
-  REQUIRED_METHODS = %i(name title link_url)
+  REQUIRED_METHODS = %i(title)
   OBJECT_ATTRS = %w(hashtag_words bitly_auth msg_length name title link_url)
 
   attr_reader :item, :title
